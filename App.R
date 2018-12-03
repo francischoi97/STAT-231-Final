@@ -5,7 +5,6 @@ library(ggplot2)
 library(tidyr)
 client_id = "58c2614435ab4c29b750b180d0063922"
 client_secret = "ab34d429d0df46e3b13d18d7fe0c1473"
-#playlist_id <- "4ypGOFBUUvYcKZE8TbTPYZ"
 
 # Define UI for random distribution app ----
 ui <- fluidPage(
@@ -57,7 +56,6 @@ server <- function(input, output) {
       analysis <- jsonlite::fromJSON(url1)
       url2 <- paste("https://api.spotify.com/v1/tracks/",i,"?access_token=",access_token,sep="")
       info <- jsonlite::fromJSON(url2)
-      print("haha")
       data <- rbind(data,data.frame(info$name, info$artists$name[1], info$album$name,info$album$release_date, analysis$tempo, analysis$duration_ms, analysis$loudness, info$popularity))
     }
     
