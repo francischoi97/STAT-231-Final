@@ -49,7 +49,7 @@ for(i in alphabet){
     data <- rbind(data,playlistsdata)
   }
 }
-data.test<-data %>% distinct(playlists.playlists.items.id,.keep_all = T)
+data<-data %>% distinct(playlists.playlists.items.id,.keep_all = T)
 data <- data[-c(grep(TRUE,data[,2] == 0)),]
 rownames(data) <- 1:nrow(data)
 
@@ -71,7 +71,7 @@ for(i in 1:length(data[,1])){
     
   }
   if(is.null(songs)){
-    next()
+    next() #thank u
   }
   loops2 <- ceiling(length(songs)/50)
   
