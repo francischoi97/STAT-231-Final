@@ -18,8 +18,6 @@ check <- function(url){
   return(res)
 }
 
-req <- paste("https://api.spotify.com/v1/search?type=playlist&q=workout&access_token=",access_token,sep="")
-
 client_id = "58c2614435ab4c29b750b180d0063922"
 client_secret = "ab34d429d0df46e3b13d18d7fe0c1473"
 
@@ -57,11 +55,11 @@ for(i in 1:length(data[,1])){
   playlist_id <- data[i,3]
   leng <- data[i,2]
   loops <- as.integer(leng/100)
-  songs <- NULL
   
   url <- paste("https://api.spotify.com/v1/playlists/",playlist_id,"?access_token=",access_token,sep = "")
   followers <- check(url)$followers$total
   data[i,4] <- followers
+  songs <- NULL
   
   for(j in 0:loops){
     offset <- j*100
