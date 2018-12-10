@@ -33,7 +33,7 @@ ui <- fluidPage(
     # Sidebar panel for inputs ----
     sidebarPanel(
       
-      textInput("playlist_id",h3("Playlist ID"))      
+      textInput("playlist_id",h3("Playlist ID"),placeholder = "37i9dQZEVXbLRQDuF5jeBp",value = "37i9dQZEVXbLRQDuF5jeBp")      
       
     ),
     
@@ -42,7 +42,7 @@ ui <- fluidPage(
       
       # Output: Tabset w/ plot, summary, and table ----
       tabsetPanel(type = "tabs",
-                  tabPanel("Table", tableOutput("table")))
+                  tabPanel("Playlist Table", htmlOutput("statement"),DT::dataTableOutput("table")))
       
     )
   )
@@ -55,21 +55,9 @@ server <- function(input, output) {
   # This is called whenever the inputs change. The output functions
   # defined below then use the value computed from this expression
   playlist <- reactive({
-    
-    post <- POST('https://accounts.spotify.com/api/token',
-                 accept_json(), authenticate(client_id, client_secret),
-                 body = list(grant_type = 'client_credentials'),
-                 encode = 'form', httr::config(http_version = 2)) %>% content
-    access_token <- post$access_token
-    
+    inf <- playlistdata()
     playlist_id <- input$playlist_id
-    print(playlist_id)
-    
-    
-    url <- paste("https://api.spotify.com/v1/playlists/",playlist_id,"?access_token=",access_token,sep = "")
-    playlist <- check(url)
-    followers <- playlist$followers$total
-    leng <- playlist$tracks$total
+    leng <- inf$songs
     loops <- as.integer(leng/100)
     
     songs <- NULL
@@ -106,9 +94,48 @@ server <- function(input, output) {
     
   })
   
+  playlistdata <- reactive({
+    post <- POST('https://accounts.spotify.com/api/token',
+                 accept_json(), authenticate(client_id, client_secret),
+                 body = list(grant_type = 'client_credentials'),
+                 encode = 'form', httr::config(http_version = 2)) %>% content
+    access_token <- post$access_token
+    
+    playlist_id <- input$playlist_id
+    print(playlist_id)
+    
+    url <- paste("https://api.spotify.com/v1/playlists/",playlist_id,"?access_token=",access_token,sep = "")
+    playlist <- check(url)
+    
+    playlistinfo <- NULL
+    playlistinfo$name <- playlist$name
+    playlistinfo$songs <- playlist$tracks$total
+    playlistinfo$followers<- playlist$followers$total
+    playlistinfo
+  })
+  
   # Generate an HTML table view of the data ----
-  output$table <- renderTable({
+  output$table <- DT::renderDataTable({
     playlist() 
+    
+  })
+  
+  output$statement <- renderText({
+    inf <- playlistdata()
+    if(inf$followers != 1){
+      s1 <-  " followers!<br/>"
+    }else{
+      s1 <-  " follower!<br/>"
+    }
+    if(inf$songs != 1){
+      s2 <- "There are "
+      s3 <-  " tracks on your playlist."
+    }else{
+      s2 <- "There is "
+      s3 <-  " track on your playlist."
+    }
+    string <- paste("Info for playlist: ",inf$name,"<br/>Your playlist has ", inf$followers, s1,s2,inf$songs, s3,sep="")
+    return(string)
   })
   
 }
