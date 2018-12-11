@@ -3,7 +3,8 @@ library(dplyr)
 library(httr)
 library(ggplot2)
 library(tidyr)
-source('config.R')
+client_id <- "58c2614435ab4c29b750b180d0063922"
+client_secret <- "ab34d429d0df46e3b13d18d7fe0c1473"
 
 check <- function(url){
   attempt <- 0
@@ -121,10 +122,21 @@ server <- function(input, output) {
     playlistinfo
   })
   
+  playlistana <- reactive({
+    df <- playlist()
+    df2 <- playlistdata()
+    out <- NULL
+    out$avgpop <- mean(as.numeric(unlist(df["Popularity"])),na.rm = T)
+    out$avglen <- mean(as.numeric(unlist(df["Duration"])),na.rm = T)
+    out$maxlen <- max(as.numeric(unlist(df["Duration"])),na.rm = T)
+    out$minlen <- min(as.numeric(unlist(df["Duration"])),na.rm = T)
+    out$songs <- df2$songs
+    out
+  })
+  
   # Generate an HTML table view of the data ----
   output$table <- DT::renderDataTable({
     playlist() 
-    
   })
   
   output$statement <- renderText({
