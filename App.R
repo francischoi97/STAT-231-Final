@@ -131,7 +131,14 @@ server <- function(input, output) {
     out$maxlen <- max(as.numeric(unlist(df["Duration"])),na.rm = T)
     out$minlen <- min(as.numeric(unlist(df["Duration"])),na.rm = T)
     out$songs <- df2$songs
-    out
+    out$followers<- df2$followers
+    temp<-c(out$followers,out$songs,out$avgpop,out$avglen,out$maxlen,out$minlen)
+    
+    traindata <- read.csv("playlistsummary.csv",header=T)
+    traindata <- traindata[,-1]
+    model <- knn.reg(train=traindata,test=temp,y=traindata$numFollowers,k=43)
+    
+    min(floor(model$pred/30000),100)
   })
   
   # Generate an HTML table view of the data ----
@@ -141,6 +148,7 @@ server <- function(input, output) {
   
   output$statement <- renderText({
     inf <- playlistdata()
+    score <- playlistana()
     if(inf$followers != 1){
       s1 <-  " followers!<br/>"
     }else{
@@ -153,7 +161,7 @@ server <- function(input, output) {
       s2 <- "There is "
       s3 <-  " track on your playlist."
     }
-    string <- paste("Info for playlist: ",inf$name,"<br/>Your playlist has ", inf$followers, s1,s2,inf$songs, s3,sep="")
+    string <- paste("Info for playlist: ",inf$name,"<br/>Your playlist has ", inf$followers, s1,s2,inf$songs, s3,"<br/>Playlist score is ",score,sep="")
     return(string)
   })
   
