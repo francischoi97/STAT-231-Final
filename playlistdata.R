@@ -2,12 +2,8 @@ library(httr)
 library(dplyr)
 source('config.R')
 
-#######################
-# config.R
-#######################
-# client_id <- "your_client_id"
-# client_secret <- "your_client_secret"
-# playlist_id <- "your_playlist_id"
+
+playlist_id <- "your_playlist_id"
 
 post <- POST('https://accounts.spotify.com/api/token',
              accept_json(), authenticate(client_id, client_secret),
