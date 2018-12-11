@@ -3,6 +3,7 @@ import sklearn
 import warnings
 import csv
 import os.path
+from math import sqrt
 from six.moves import cPickle as pickle
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
@@ -124,7 +125,7 @@ if __name__ == "__main__":
 			file.write("\n")
 
 	z = []
-	with open('playlists.csv','rt', encoding="utf8") as f:
+	with open('playlistsummary.csv','rt', encoding="utf8") as f:
 		reader = csv.reader(f)
 		for line in reader:
 			z.append(line)
@@ -145,6 +146,7 @@ if __name__ == "__main__":
 	X_tr, X_te, y_tr, y_te = train_test_split(X_train, Y_train)
 	print(X_tr)
 	print(y_tr)
+	
 	best=[0,0,0] #should contain C value, model parameter, and MSE of best model
 	for h in range(4):
 		C=pow(10,h)
@@ -178,30 +180,30 @@ if __name__ == "__main__":
 				best[2]=errorsigmoid
 				best[1]="r = "+str(r)
 				best[0]=C
-
+	print(best)
+	
 	zeroSums = np.zeros((22))
 	count = 0
 	#Knn
-	neighborList = [2*x+1 for x in range(12)]
+	neighborList = [2*x+25 for x in range(12)]
 	for value in neighborList:
 		kNeighbors = KNeighborsRegressor(n_neighbors = value)
-		zeroSums[count] = cross_validation(X_tr, y_tr, kNeighbors, RMSE, num_folds = 103)
+		zeroSums[count] = sqrt(-np.mean(cross_val_score(kNeighbors, X_tr, y_tr, cv=10, scoring='neg_mean_squared_error')))
 		count +=1
 
 	#Decision Tree
-	depthList = [x+2 for x in range(10)]
+	depthList = [x+1 for x in range(10)]
 	for depth in depthList:
 		dTree = DecisionTreeRegressor(max_depth = depth)
-		zeroSums[count] = cross_validation(X_tr, y_tr, dTree, RMSE, num_folds = 103)
+		zeroSums[count] = sqrt(-np.mean(cross_val_score(dTree, X_tr, y_tr, cv=10, scoring='neg_mean_squared_error')))
 		count +=1
 
 	print(zeroSums)
 
-	print(best)
+
 
 	#bestmodel=SVC(C=1000, kernel='poly', degree=2)
 	#bestmodel.fit(transformtrain,y_tr)
 	#y_pred=bestmodel.predict(transformtest)
 	#print(confusion_matrix(y_te,y_pred))
 	#print(classification_report(y_te, y_pred, target_names=['class0','class1']))
-	
