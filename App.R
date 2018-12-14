@@ -1,10 +1,11 @@
+library(mosaic)
 library(xtable)
 library(dplyr)
 library(httr)
 library(ggplot2)
 library(tidyr)
-client_id <- "58c2614435ab4c29b750b180d0063922"
-client_secret <- "ab34d429d0df46e3b13d18d7fe0c1473"
+library(FNN)
+source('config.R')
 
 check <- function(url){
   attempt <- 0
@@ -138,7 +139,7 @@ server <- function(input, output) {
     traindata <- traindata[,-1]
     model <- knn.reg(train=traindata,test=temp,y=traindata$numFollowers,k=43)
     
-    min(floor(model$pred/30000),100)
+    min(floor(log(model$pred)*6.5),100)
   })
   
   # Generate an HTML table view of the data ----
@@ -161,7 +162,7 @@ server <- function(input, output) {
       s2 <- "There is "
       s3 <-  " track on your playlist."
     }
-    string <- paste("Info for playlist: ",inf$name,"<br/>Your playlist has ", inf$followers, s1,s2,inf$songs, s3,"<br/>Playlist score is ",score,sep="")
+    string <- paste("Info for playlist: ",inf$name,"<br/>Your playlist has ", inf$followers, s1,s2,inf$songs, s3,"<br/><font size=\"24\">Playlist score is ",score,"</font>",sep="")
     return(string)
   })
   
