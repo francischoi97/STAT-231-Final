@@ -161,7 +161,8 @@ server <- function(input, output) {
     traindata <- traindata[,-1]
     model <- knn.reg(train=traindata,test=temp,y=traindata$numFollowers,k=43)
     
-    # Important: gets the follower prediction, takes the log and divides by the log(3000000) = 6.5, where 3000000 is the max followers of playlists trained on
+    print(model$pred)
+    # Important: gets the follower prediction, takes the log and divides by the log(3000000) = 6.5, where 3000000 is around the 75 percentile of followers of playlists trained on
     # Logarithm is used so that lowers predictions don't simply return 0, and ensures score is 100 maximum
     min(floor(log(model$pred)*6.5),100)
   })
