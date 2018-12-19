@@ -23,9 +23,6 @@ warnings.warn = warn
 warnings.simplefilter(action='ignore', category=FutureWarning)
 warnings.simplefilter(action='ignore', category=DeprecationWarning)
 
-#  C:\Users\franc\AppData\Local\Programs\Python\Python37-32\python.exe modelselect.py
-#  cd Documents\STAT231\final
-
 def cross_validation(X, y, reg, evaler, num_folds):
     numDim = X.shape[1] # just helping out, technically didnt need
     runningSum = 0
